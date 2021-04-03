@@ -22,6 +22,7 @@ def users():
         )
         db.session.add(new_user)  # Adds new User record to database
         db.session.commit()  # Commits all changes
+        db.session.refresh(new_user)
         serialized_data = serialize_single(new_user)
         return jsonify(serialized_data)
 
@@ -29,5 +30,6 @@ def users():
 @app.route("/users/<int:user_id>", methods=["GET", "POST"])
 def user(user_id):
     queried_user = db.session.query(User).filter(id=user_id).first()
+    print(queried_user)
     serialized_data = serialize_single(queried_user)
     return jsonify(serialized_data)
