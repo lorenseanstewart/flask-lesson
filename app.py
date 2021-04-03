@@ -2,14 +2,14 @@ from flask import make_response, request, jsonify
 
 from models import User
 from startup import app, db
-from utils import serializer
+from utils import serialize_single, serialize_list
 
 
 @app.route("/users", methods=["GET", "POST"])
 def users():
     if request.method == "GET":
         queryset = db.session.query(User).all()
-        serialized_data = serializer(queryset)
+        serialized_data = serialize_list(queryset)
         return jsonify(serialized_data)
     else:
         # this is the POST route
@@ -22,9 +22,12 @@ def users():
         )
         db.session.add(new_user)  # Adds new User record to database
         db.session.commit()  # Commits all changes
-        return make_response("yay")
+        serialized_data = serialize_single(new_user)
+        return jsonify(serialized_data)
 
 
 @app.route("/users/<int:user_id>", methods=["GET", "POST"])
 def user(user_id):
-    return make_response(f"back at you id: {user_id}")
+    queried_user = db.session.query(User).filter(id=user_id).first()
+    serialized_data = serialize_single(queried_user)
+    return jsonify(serialized_data)
