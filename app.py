@@ -5,26 +5,7 @@ from startup import app, db
 from utils import serializer
 
 
-@app.route("/users", methods=["GET", "POST"])
-def users():
-    if request.method == "GET":
-        queryset = db.session.query(User).all()
-        serialized_data = serializer(queryset)
-        return jsonify(serialized_data)
-    else:
-        # this is the POST route
-        data = request.get_json()
-        new_user = User(
-            username=data.get("username"),
-            email=data.get("email"),
-            bio=data.get("bio"),
-            admin=data.get("admin"),
-        )
-        db.session.add(new_user)  # Adds new User record to database
-        db.session.commit()  # Commits all changes
-        return make_response("yay")
+# make a route that can (1) get all users or (2) create a new user
 
 
-@app.route("/users/<int:user_id>", methods=["GET", "POST"])
-def user(user_id):
-    return make_response(f"back at you id: {user_id}")
+# create a route that gets a single user by id
