@@ -1,3 +1,4 @@
+from operator import truediv
 from flask import make_response, request, jsonify
 
 from models import User
@@ -36,4 +37,25 @@ def user(user_id):
     else:
         return jsonify(f'User with id {user_id} not found')
 
-# create a route that gets a single user by id
+
+@app.route("/users/<int:user_id>", methods=["PATCH"])
+def patch_user(user_id):
+    patch_user = db.session.query(User).get(user_id)
+    if patch_user:
+        data = request.get_json()
+        if 'username' in data:
+            patch_user.username = data['username']
+        if 'email' in data:
+            patch_user.email = data['email']
+        if 'bio' in data:
+            patch_user.bio = data['bio']
+        if 'admin' in data:
+            patch_user.admin = data['admin']
+
+        db.session.commit()
+        db.session.refresh(patch_user)
+
+        serialized_data = serialize_single(patch_user)
+        return jsonify(serialized_data)
+    else:
+        return jsonify(f'User with id {user_id} not found')
